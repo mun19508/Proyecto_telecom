@@ -73,6 +73,7 @@ class Ventana(QtWidgets.QDialog, Ui_Dialog):
         # __________________________________________________________________________________
         AS_Path_BGPI, AS_Path_BGPE = RIPE_BGPlay(ip, initial_time, end_time)  # Rutas de los AS
         AS_path0_bgp = Path_Generator(AS_Path_BGPI, AS_end)
+       
         # __________________________________________________________________________________
         # Rutina para la obtencion de el cambio de rutas de AS:
         AS_notchange = []
@@ -262,6 +263,8 @@ def Path_Generator(List_ASN, dest):
     Aux = []
     for i in range(len(List_ASN)-1):
         try:
+            if List_ASN[i][0] ==dest:
+                print(List_ASN[i])
             k= List_ASN[i].index(dest)
             for j in range(len(List_ASN[i])-k):
                 if List_ASN[i][j+k] not in Aux:
