@@ -26,34 +26,38 @@ class Ventana(QtWidgets.QDialog, Ui_Dialog):
     '''Funcion en la cual se grafica la informacion obtenida de ris-peering'''
 
     def PlotRISP(self):
-        ip = self.IP_Input.text()
+        ip = self.IP_Input.text()  # Se obtiene la IP destino
         # __________________________________________________________________________________
+        # Rutina empleada para obtener la informacion del AS destino
         AS_end_str = self.AS_Input.text()
         if AS_end_str != '':
             AS_end = int(AS_end_str)
         else:
             AS_end = []
         # __________________________________________________________________________________
-        AS_Path_RISP = RIPE_RIS_peerings(ip)  # Rutas de los AS
+        initial_time = '{}T{}'.format(self.dateStart_Input.text(), self.timeStart_Input.text())
+        
+        end_time = '{}T{}'.format(self.dateEnd_Input.text(), self.timeEnd_Input.text())
         # __________________________________________________________________________________
-        # Se obtiene la ruta de inteteres
-        AS_path0_risp = Path_Generator(AS_Path_RISP, AS_end)
+        AS_Path_BGPI, AS_Path_BGPE = RIPE_BGPlay(ip, initial_time, end_time)  # Rutas de los AS
+        AS_path0_bgp = Path_Generator(AS_Path_BGPI, AS_end)
+       
         # __________________________________________________________________________________
-        AS_PairList_risp = Pair_Generator(
-            AS_Path_RISP)  # Propagacion de anuncios
+        # Rutina para la obtencion de el cambio de rutas de AS:
+       
+        # Propagacion de anuncios (inicio)
+        AS_PairList_BGI = Pair_Generator(AS_Path_BGPI)
         # __________________________________________________________________________________
-        AS_RISP_NodeList = Node_Generator(
-            AS_Path_RISP)  # Nodos sin los de interes
-        if AS_path0_risp != []:
-            try:
-                for element in AS_path0_risp:
-                    AS_RISP_NodeList.remove(element)
-            except:
-                pass
-        else:
-            AS_RISP_NodeList.remove(AS_Path_RISP[0][-1])
+        BGP_Node = AS_Path_BGPI
+        AS_BGP_NodeList = Node_Generator(BGP_Node)  # Nodos sin los de interes
+        for element in AS_path0_bgp:
+            AS_BGP_NodeList.remove(element)
+        try:
+            AS_BGP_NodeList.remove(AS_Path_BGPI[0][-1])
+        except:
+            pass
         # __________________________________________________________________________________
-        PlotASNRISP(AS_PairList_risp, AS_RISP_NodeList, AS_path0_risp, AS_Path_RISP[0][-1], AS_end)
+        PlotASNRISP(AS_PairList_BGI, AS_BGP_NodeList, AS_path0_bgp,  AS_Path_BGPI[0][-1], AS_end)
     # --------------------------------------------------------------------------------------
     '''Funcion en la cual se grafica la informacion obtenida de bgplay'''
 
